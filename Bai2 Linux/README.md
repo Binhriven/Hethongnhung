@@ -8,4 +8,3 @@
 
 ![Ảnh 4](anh4.png)
 
-![Ảnh 5](anh5.png)
