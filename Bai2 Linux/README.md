@@ -4,8 +4,8 @@
 
 ![Ảnh 2](anh2.png)
 
-![Ảnh 3](anh3.png)
+![Ảnh 3](1.jpg)
 
-![Ảnh 4](anh4.png)
+![Ảnh 4](2.jpg)
 
-![Ảnh 6](anh6.png)
+![Ảnh 6](4.jpg)
