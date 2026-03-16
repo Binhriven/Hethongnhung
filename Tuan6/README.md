@@ -3,65 +3,99 @@
 ## 1. Mục tiêu
 
 * Tìm hiểu cách viết **Linux Device Driver**
-* Giao tiếp giữa **User Space và Kernel Space**
+* Hiểu cơ chế **giao tiếp giữa User Space và Kernel Space**
 * Điều khiển LED thông qua **device file**
 * Tích hợp chương trình vào **Buildroot**
 * Boot hệ thống trên **BeagleBone Black**
 
 ---
 
-# 2. Mô hình hệ thống
+# Bài 1: Viết Linux LED Driver
 
+## 1.1 Mô hình hệ thống
+
+```
 User Application
-↓
-Device File `/dev/led_test`
-↓
+      │
+      ▼
+Device File (/dev/led_test)
+      │
+      ▼
 Kernel Driver
-↓
+      │
+      ▼
 GPIO
-↓
+      │
+      ▼
 LED
+```
+
+Driver trong Kernel sẽ điều khiển GPIO để bật/tắt LED.
 
 ---
 
-# 3. Driver LED
+## 1.2 Device File
 
-Driver tạo device:
+Driver sẽ tạo device:
 
 ```
 /dev/led_test
 ```
 
-Nguyên lý hoạt động:
+User Application sẽ ghi dữ liệu vào device này để điều khiển LED.
+
+---
+
+## 1.3 Nguyên lý hoạt động
 
 | Giá trị ghi | Chức năng |
 | ----------- | --------- |
-| "1"         | Bật LED   |
-| "0"         | Tắt LED   |
+| 1           | Bật LED   |
+| 0           | Tắt LED   |
 
-Load driver:
+---
+
+## 1.4 Load Driver
+
+Sau khi biên dịch driver:
 
 ```
 insmod led_driver.ko
 ```
 
-Kiểm tra module:
+Kiểm tra module đã load:
 
 ```
 lsmod
 ```
 
+Kiểm tra device file:
+
+```
+ls /dev/led_test
+```
+
 ---
 
-# 4. Chương trình Blink LED
+# Bài 2: Chương trình Blink LED (User Application)
 
-File:
+## 2.1 Mục tiêu
+
+* Viết chương trình **User Space**
+* Giao tiếp với **Device Driver**
+* Điều khiển LED bật tắt liên tục
+
+---
+
+## 2.2 File chương trình
 
 ```
 blink_app.c
 ```
 
-Code chương trình:
+---
+
+## 2.3 Code chương trình
 
 ```c
 #include <stdio.h>
@@ -102,15 +136,28 @@ int main()
 
 ---
 
-# 5. Build hệ thống bằng Buildroot
+## 2.4 Hoạt động của chương trình
 
-Build project:
+Chương trình thực hiện:
+
+1. Mở device `/dev/led_test`
+2. Ghi `"1"` để bật LED
+3. Ghi `"0"` để tắt LED
+4. Lặp lại mỗi 1 giây
+
+---
+
+# Bài 3: Build hệ thống bằng Buildroot và chạy trên BeagleBone Black
+
+## 3.1 Build hệ thống
+
+Tại thư mục Buildroot:
 
 ```
 make
 ```
 
-Sau khi build xong:
+Sau khi build thành công:
 
 ```
 output/images/sdcard.img
@@ -118,7 +165,7 @@ output/images/sdcard.img
 
 ---
 
-# 6. Flash image vào SD Card
+## 3.2 Flash Image vào SD Card
 
 Kiểm tra thiết bị:
 
@@ -126,7 +173,7 @@ Kiểm tra thiết bị:
 lsblk
 ```
 
-Unmount SD:
+Unmount SD card:
 
 ```
 sudo umount /dev/sdb1
@@ -142,7 +189,7 @@ sync
 
 ---
 
-# 7. Boot hệ thống
+## 3.3 Boot hệ thống
 
 Kết nối UART:
 
@@ -158,42 +205,61 @@ Welcome to Buildroot
 
 ---
 
-# 8. Kết quả
+## 3.4 Chạy chương trình Blink LED
 
-LED nháy liên tục:
+Load driver:
 
 ```
+insmod led_driver.ko
+```
+
+Chạy ứng dụng:
+
+```
+./blink_app
+```
+
+Kết quả trên terminal:
+
+```
+Blink LED
 LED ON
 LED OFF
 LED ON
 LED OFF
 ```
+
+LED trên board **BeagleBone Black** sẽ nháy liên tục.
 
 ---
 
-# 9. Hình ảnh kết quả
+# Kết quả thực nghiệm
 
 ## Boot hệ thống
 
-![boot](1.jpg)
-
-## Log UART
-
-![uart](2.jpg)
-
-## LED hoạt động
-
-![led](3.jpg)
+![boot](boot.jpg)
 
 ---
 
-# 10. Kết luận
+## Log UART
+
+![uart](uart.jpg)
+
+---
+
+## LED hoạt động
+
+![led](led.jpg)
+
+---
+
+# Kết luận
 
 Qua bài thực hành này đã:
 
 * Viết thành công **Linux Device Driver**
 * Tạo device file `/dev/led_test`
-* Giao tiếp giữa **User Space và Kernel Space**
-* Tích hợp ứng dụng vào **Buildroot**
-* Chạy thành công trên **BeagleBone Black**
-
+* Viết **User Application** điều khiển LED
+* Tích hợp chương trình vào **Buildroot**
+* Boot hệ thống thành công trên **BeagleBone Black**
+* Điều khiển LED nháy thông qua driver
