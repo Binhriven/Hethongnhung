@@ -1,50 +1,61 @@
-📌 BT05 – Biên dịch Ứng dụng và Thư viện với Buildroot
-📖 Giới thiệu
+# 📌 BT05 – Biên dịch Ứng dụng và Thư viện với Buildroot
+
+## 📖 Giới thiệu
 
 Bài tập này hướng dẫn cách sử dụng Buildroot để:
 
-Biên dịch ứng dụng với thư viện có sẵn (cJSON)
+* Biên dịch ứng dụng với thư viện có sẵn (cJSON)
+* Tự tạo thư viện bằng C (static & dynamic)
+* Đóng gói (package) thư viện và ứng dụng vào hệ điều hành
 
-Tự tạo thư viện bằng C (static & dynamic)
+📟 Hệ thống sử dụng: BeagleBone Black (BBB)
 
-Đóng gói (package) thư viện và ứng dụng vào hệ điều hành
+---
 
-Hệ thống sử dụng: BeagleBone Black (BBB)
+## 🎯 Mục tiêu
 
-🎯 Mục tiêu
+* Hiểu cơ chế cross-compile
+* Phân biệt thư viện tĩnh (.a) và thư viện động (.so)
+* Hiểu cách dùng sysroot
+* Tạo package tùy chỉnh
+* Tích hợp ứng dụng vào hệ thống Linux nhúng
 
-Hiểu cơ chế cross-compile
+---
 
-Làm việc với thư viện tĩnh (.a) và động (.so)
+# 🧪 Bài 1: Biên dịch ứng dụng với thư viện cJSON
 
-Sử dụng sysroot trong Buildroot
+## 🔧 Bước 1: Bật cJSON trong Buildroot
 
-Tạo package tùy chỉnh
-
-Tích hợp ứng dụng vào hệ thống Linux nhúng
-
-🧪 Bài 1: Biên dịch ứng dụng với thư viện cJSON
-🔧 Bước 1: Bật cJSON trong Buildroot
+```bash
 make menuconfig
+```
 
-Đi theo đường dẫn:
+👉 Chọn:
 
+```
 Target packages ---> Libraries ---> JSON/XML ---> [*] cJSON
+```
 
-Sau đó build lại:
+Build lại:
 
+```bash
 make
+```
 
-📌 Sau khi build:
+---
 
-Thư viện .so:
+## 📌 Kết quả sau khi build
 
-output/target/usr/lib
+| Thành phần   | Đường dẫn                                                           |
+| ------------ | ------------------------------------------------------------------- |
+| Thư viện .so | output/target/usr/lib                                               |
+| Header .h    | output/host/arm-buildroot-linux-gnueabihf/sysroot/usr/include/cjson |
 
-File header .h:
+---
 
-output/host/arm-buildroot-linux-gnueabihf/sysroot/usr/include/cjson
-📝 Bước 2: Viết chương trình HelloJSON.c
+## 📝 Bước 2: Viết chương trình
+
+```c
 #include <stdio.h>
 #include <cjson/cJSON.h>
 
@@ -56,195 +67,295 @@ int main() {
     cJSON_Delete(json);
     return 0;
 }
-⚙️ Bước 3: Cross-compile
+```
+
+---
+
+## ⚙️ Bước 3: Cross-compile
+
+```bash
 ./output/host/bin/arm-buildroot-linux-gnueabihf-gcc HelloJSON.c -o HelloJSON \
 -I./output/host/arm-buildroot-linux-gnueabihf/sysroot/usr/include/cjson \
 -L./output/host/arm-buildroot-linux-gnueabihf/sysroot/usr/lib \
 -lcjson
+```
 
-📌 Giải thích:
+---
 
--I: đường dẫn header
+## 📌 Giải thích
 
--L: đường dẫn thư viện
+* `-I`: đường dẫn header
+* `-L`: đường dẫn thư viện
+* `-lcjson`: link thư viện
+  👉 Vì cross-compile nên phải dùng sysroot
 
--lcjson: link với cJSON
+---
 
-🚀 Bước 4: Copy sang BBB
+## 🚀 Bước 4: Copy sang BBB
+
+```bash
 scp HelloJSON root@<IP_BBB>:/root/
+```
 
 Nếu thiếu thư viện:
 
+```bash
 scp output/target/usr/lib/libcjson.so* root@<IP_BBB>:/usr/lib/
-▶️ Bước 5: Chạy chương trình
+```
+
+---
+
+## ▶️ Bước 5: Chạy
+
+```bash
 ./HelloJSON
-🧪 Bài 2: Tạo thư viện cá nhân
-📌 Bước 1: Tạo thư viện
+```
 
-Ví dụ:
+---
 
-libptit.h
+## 🔍 Giải thích
 
-libptit.c
+* `cJSON_CreateObject()` → tạo JSON
+* `cJSON_AddStringToObject()` → thêm dữ liệu
+* `cJSON_Print()` → in JSON
+* `cJSON_Delete()` → giải phóng bộ nhớ
 
-⚙️ Bước 2: Biên dịch thư viện
-🔹 Thư viện tĩnh (.a)
+---
+
+## 📷 Ảnh kết quả
+
+![BT05\_Bai1](link_anh_cua_ban)
+
+---
+
+# 🧪 Bài 2: Tạo thư viện cá nhân
+
+## 📌 Bước 1: Tạo thư viện
+
+* libptit.h
+* libptit.c
+
+---
+
+## ⚙️ Bước 2: Biên dịch
+
+### 🔹 Static (.a)
+
+```bash
 ./output/host/bin/arm-buildroot-linux-gnueabihf-gcc -c libptit.c -o libptit.o
 ./output/host/bin/arm-buildroot-linux-gnueabihf-ar rcs libptit.a libptit.o
-🔹 Thư viện động (.so)
+```
+
+### 🔹 Dynamic (.so)
+
+```bash
 ./output/host/bin/arm-buildroot-linux-gnueabihf-gcc -fPIC -c libptit.c -o libptit.o
 ./output/host/bin/arm-buildroot-linux-gnueabihf-gcc -shared -o libptit.so libptit.o
+```
 
-📌 -fPIC: cho phép thư viện chạy ở nhiều vị trí bộ nhớ
+---
 
-📂 Bước 3: Đưa vào sysroot
+## 📌 Giải thích
+
+* `-fPIC`: cho phép load nhiều vùng nhớ
+* `.a`: thư viện tĩnh
+* `.so`: thư viện động
+
+---
+
+## 📂 Bước 3: Đưa vào sysroot
+
+```bash
 SYSROOT=$(pwd)/output/host/arm-buildroot-linux-gnueabihf/sysroot  
 
 cp libptit.h $SYSROOT/usr/include/
 cp libptit.a libptit.so $SYSROOT/usr/lib/
-🧪 Bước 4: Viết app sử dụng thư viện
-🔹 Dùng static
+```
+
+---
+
+## 🧪 Bước 4: Compile app
+
+### Static
+
+```bash
 ./output/host/bin/arm-buildroot-linux-gnueabihf-gcc app_test.c -o app_static -lptit -static
-🔹 Dùng dynamic
+```
+
+### Dynamic
+
+```bash
 ./output/host/bin/arm-buildroot-linux-gnueabihf-gcc app_test.c -o app_dynamic -lptit
-🚀 Bước 5: Chạy trên BBB
+```
+
+---
+
+## 🚀 Bước 5: Chạy trên BBB
+
+```bash
 scp app_static app_dynamic root@<IP_BBB>:/root/
 scp libptit.so root@<IP_BBB>:/usr/lib/
+```
 
 Chạy:
 
+```bash
 ./app_static
 ./app_dynamic
-🔍 Bước 6: So sánh
+```
+
+---
+
+## 🔍 Bước 6: So sánh
+
+```bash
 ls -lh
+```
 
-Kiểm tra dependency:
-
+```bash
 ./output/host/bin/arm-buildroot-linux-gnueabihf-readelf -d app_dynamic | grep NEEDED
+```
 
-📌 Kết luận:
+---
 
-Static: file lớn, chạy độc lập
+## 📌 Kết luận
 
-Dynamic: nhỏ hơn, cần .so
+| Loại    | Ưu điểm      | Nhược điểm |
+| ------- | ------------ | ---------- |
+| Static  | Chạy độc lập | File lớn   |
+| Dynamic | Nhẹ          | Cần .so    |
 
-🧪 Bài 3: Tích hợp vào Buildroot
-📦 Bước 1: Tạo package libkmt
+---
+
+## 📷 Ảnh kết quả
+
+![BT05\_Bai2](link_anh_cua_ban)
+
+---
+
+# 🧪 Bài 3: Tích hợp vào Buildroot
+
+## 📦 Bước 1: Tạo package
+
+```bash
 mkdir -p package/libkmt/src
-📄 Config.in
+```
+
+### Config.in
+
+```make
 config BR2_PACKAGE_LIBKMT
     bool "libkmt"
-📄 libkmt.mk
-LIBKMT_VERSION = 1.0
-LIBKMT_SITE = $(TOPDIR)/package/libkmt/src
-LIBKMT_SITE_METHOD = local
-LIBKMT_INSTALL_STAGING = YES
+```
 
-define LIBKMT_BUILD_CMDS
-    $(TARGET_CC) $(TARGET_CFLAGS) -fPIC -c $(@D)/kmt.c -o $(@D)/kmt.o
-    $(TARGET_AR) rcs $(@D)/libkmt.a $(@D)/kmt.o
-    $(TARGET_CC) -shared $(TARGET_CFLAGS) -o $(@D)/libkmt.so $(@D)/kmt.o
-endef
+---
 
-define LIBKMT_INSTALL_STAGING_CMDS
-    $(INSTALL) -D -m 0644 $(@D)/kmt.h $(STAGING_DIR)/usr/include/kmt.h
-    $(INSTALL) -D -m 0755 $(@D)/libkmt.a $(STAGING_DIR)/usr/lib/libkmt.a
-    $(INSTALL) -D -m 0755 $(@D)/libkmt.so $(STAGING_DIR)/usr/lib/libkmt.so
-endef
+## 📌 Giải thích
 
-define LIBKMT_INSTALL_TARGET_CMDS
-    $(INSTALL) -D -m 0755 $(@D)/libkmt.so $(TARGET_DIR)/usr/lib/libkmt.so
-endef
+* BUILD_CMDS → build
+* INSTALL_STAGING → sysroot
+* INSTALL_TARGET → rootfs
 
-$(eval $(generic-package))
-🧩 Bước 2: Tạo ứng dụng combined_app
+---
+
+## 🧩 Bước 2: Tạo app
+
+```bash
 mkdir -p package/combined_app/src
-📄 combined_app.c
-#include <stdio.h>
-#include <cjson/cJSON.h>
-#include <kmt.h>
+```
 
-int main() {
-    const char *data = "{\"val1\": 15, \"val2\": 25}";
-    cJSON *json = cJSON_Parse(data);
+👉 App sử dụng:
 
-    int v1 = cJSON_GetObjectItem(json, "val1")->valueint;
-    int v2 = cJSON_GetObjectItem(json, "val2")->valueint;
+* cJSON
+* libkmt
 
-    printf("val1=%d, val2=%d\n", v1, v2);
-    printf("Tong: %d\n", tinh_tong(v1, v2));
+---
 
-    cJSON_Delete(json);
-    return 0;
-}
-📦 Bước 3: Package cho app
-📄 Config.in
-config BR2_PACKAGE_COMBINED_APP
-    bool "combined_app"
-    select BR2_PACKAGE_CJSON
-    select BR2_PACKAGE_LIBKMT
-📄 combined_app.mk
-COMBINED_APP_VERSION = 1.0
-COMBINED_APP_SITE = $(TOPDIR)/package/combined_app/src
-COMBINED_APP_SITE_METHOD = local
-COMBINED_APP_DEPENDENCIES = cjson libkmt
+## 📦 Bước 3: Package app
 
-define COMBINED_APP_BUILD_CMDS
-    $(TARGET_CC) $(TARGET_CFLAGS) $(@D)/combined_app.c -o $(@D)/combined_app \
-    $(TARGET_LDFLAGS) -lcjson -lkmt
-endef
+Dependency:
 
-define COMBINED_APP_INSTALL_TARGET_CMDS
-    $(INSTALL) -D -m 0755 $(@D)/combined_app $(TARGET_DIR)/usr/bin/combined_app
-endef
+* cjson
+* libkmt
 
-$(eval $(generic-package))
-⚙️ Bước 4: Kích hoạt package
+---
 
-Sửa file:
+## ⚙️ Bước 4: Kích hoạt
 
+Sửa:
+
+```bash
 package/Config.in
+```
 
 Thêm:
 
+```make
 menu "Custom Apps"
     source "package/libkmt/Config.in"
     source "package/combined_app/Config.in"
 endmenu
+```
+
+---
 
 Chạy:
 
+```bash
 make menuconfig
+```
 
 Chọn:
 
+```
 Custom Apps ---> [*] combined_app
-🏗️ Build lại hệ thống
+```
+
+---
+
+## 🏗️ Build
+
+```bash
 make
-💾 Nạp vào thẻ nhớ
+```
+
+---
+
+## 💾 Flash SD
+
+```bash
 sudo dd if=output/images/sdcard.img of=/dev/sdX bs=4M status=progress conv=fsync
-▶️ Chạy trên BBB
+```
+
+---
+
+## ▶️ Chạy trên BBB
+
+```bash
 combined_app
+```
 
-📌 Kết quả:
+---
 
-Không cần copy .so
+## 📌 Kết quả
 
-Không cần cấu hình thêm
+* Không cần copy .so
+* Chạy trực tiếp
+* Tích hợp hoàn toàn
 
-App chạy trực tiếp
+---
 
-🎓 Tổng kết
+## 📷 Ảnh kết quả
 
-Qua bài này bạn đã:
+![BT05\_Bai3](link_anh_cua_ban)
 
-Cross compile ứng dụng
+---
 
-Tạo thư viện .a và .so
+# 🎓 Tổng kết
 
-Hiểu sysroot Buildroot
-
-Tạo package riêng
-
-Tích hợp app vào hệ điều hành
-
+* Cross compile ứng dụng
+* Tạo thư viện .a và .so
+* Hiểu sysroot
+* Tạo package
+* Tích hợp vào hệ thống
+→ Tự động build + tích hợp firmware
