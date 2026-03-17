@@ -59,16 +59,6 @@ make
 #include <stdio.h>
 #include <cjson/cJSON.h>
 
-int main() {
-    cJSON *json = cJSON_CreateObject();
-    cJSON_AddStringToObject(json, "name", "Buildroot");
-
-    printf("%s\n", cJSON_Print(json));
-    cJSON_Delete(json);
-    return 0;
-}#include <stdio.h>
-#include <cjson/cJSON.h>
-
 int main()
 {
     const char *json_string = "{\"name\":\"Binh\",\"age\":22,\"city\":\"Hanoi\"}";
@@ -219,15 +209,15 @@ cp libptit.a libptit.so $SYSROOT/usr/lib/
 ## 🚀 Bước 5: Chạy trên BBB
 
 ```bash
-scp app_static app_dynamic root@<IP_BBB>:/root/
+scp test_static test_dynamic root@<IP_BBB>:/root/
 scp libptit.so root@<IP_BBB>:/usr/lib/
 ```
 
 Chạy:
 
 ```bash
-./app_static
-./app_dynamic
+./test_static
+./test_dynamic
 ```
 
 ---
@@ -255,7 +245,8 @@ ls -lh
 
 ## 📷 Ảnh kết quả
 
-![BT05\_Bai2](link_anh_cua_ban)
+![bai5](4.jpg)
+![bai5](5.jpg)
 
 ---
 
@@ -287,7 +278,7 @@ config BR2_PACKAGE_LIBKMT
 ## 🧩 Bước 2: Tạo app
 
 ```bash
-mkdir -p package/combined_app/src
+mkdir -p package/my_app/src
 ```
 
 👉 App sử dụng:
@@ -319,7 +310,7 @@ Thêm:
 ```make
 menu "Custom Apps"
     source "package/libkmt/Config.in"
-    source "package/combined_app/Config.in"
+    source "package/my_app/Config.in"
 endmenu
 ```
 
@@ -358,7 +349,7 @@ sudo dd if=output/images/sdcard.img of=/dev/sdX bs=4M status=progress conv=fsync
 ## ▶️ Chạy trên BBB
 
 ```bash
-combined_app
+my_app
 ```
 
 ---
@@ -373,7 +364,7 @@ combined_app
 
 ## 📷 Ảnh kết quả
 
-![BT05\_Bai3](link_anh_cua_ban)
+![bai1](6.jpg)
 
 ---
 
