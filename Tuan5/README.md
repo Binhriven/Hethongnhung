@@ -321,7 +321,7 @@ make menuconfig
 Chọn:
 
 ```
-Custom Apps ---> [*] combined_app
+Custom Apps ---> [*] my_app
 ```
 
 ---
@@ -347,14 +347,6 @@ sudo dd if=output/images/sdcard.img of=/dev/sdX bs=4M status=progress conv=fsync
 ```bash
 myapp
 ```
-
----
-
-## 📌 Kết quả
-
-* Không cần copy .so
-* Chạy trực tiếp
-* Tích hợp hoàn toàn
 
 ---
 
