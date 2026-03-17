@@ -148,88 +148,84 @@ scp output/target/usr/lib/libcjson.so* root@<IP_BBB>:/usr/lib/
 
 ## 📌 Bước 1: Tạo thư viện
 
-* libptit.h
-* libptit.c
+* mylib.h
+* mylib.c
 
 ---
 
-## ⚙️ Bước 2: Biên dịch
+## ⚙️ Bước 2: Biên dịch thư viện
 
 ### 🔹 Static (.a)
 
 ```bash
-./output/host/bin/arm-buildroot-linux-gnueabihf-gcc -c libptit.c -o libptit.o
-./output/host/bin/arm-buildroot-linux-gnueabihf-ar rcs libptit.a libptit.o
-```
+cd ~/buildroot/Bai2Tuan5
 
-### 🔹 Dynamic (.so)
-
-```bash
-./output/host/bin/arm-buildroot-linux-gnueabihf-gcc -fPIC -c libptit.c -o libptit.o
-./output/host/bin/arm-buildroot-linux-gnueabihf-gcc -shared -o libptit.so libptit.o
+../output/host/bin/arm-buildroot-linux-gnueabihf-gcc -c mylib.c -o mylib.o
+../output/host/bin/arm-buildroot-linux-gnueabihf-ar rcs libmylib.a mylib.o
 ```
 
 ---
 
-## 📌 Giải thích
+### 🔹 Dynamic (.so)
 
-* `-fPIC`: cho phép load nhiều vùng nhớ
-* `.a`: thư viện tĩnh
-* `.so`: thư viện động
+```bash
+cd ~/buildroot/Bai2Tuan5
+
+../output/host/bin/arm-buildroot-linux-gnueabihf-gcc -fPIC -c mylib.c -o mylib.o
+../output/host/bin/arm-buildroot-linux-gnueabihf-gcc -shared -o libmylib.so mylib.o
+```
 
 ---
 
 ## 📂 Bước 3: Đưa vào sysroot
 
 ```bash
+cd ~/buildroot
+
 SYSROOT=$(pwd)/output/host/arm-buildroot-linux-gnueabihf/sysroot  
 
-cp libptit.h $SYSROOT/usr/include/
-cp libptit.a libptit.so $SYSROOT/usr/lib/
+cp Bai2Tuan5/mylib.h $SYSROOT/usr/include/
+cp Bai2Tuan5/libmylib.a Bai2Tuan5/libmylib.so $SYSROOT/usr/lib/
 ```
 
 ---
 
 ## 🧪 Bước 4: Compile app
 
-### Static
+### 🔹 Static
 
 ```bash
-./output/host/bin/arm-buildroot-linux-gnueabihf-gcc app_test.c -o app_static -lptit -static
-```
+cd ~/buildroot/Bai2Tuan5
 
-### Dynamic
-
-```bash
-./output/host/bin/arm-buildroot-linux-gnueabihf-gcc app_test.c -o app_dynamic -lptit
+../output/host/bin/arm-buildroot-linux-gnueabihf-gcc app_test.c -o test_static -L. -lmylib -static
 ```
 
 ---
 
-## 🚀 Bước 5: Chạy trên BBB
+### 🔹 Dynamic
+
+```bash
+cd ~/buildroot/Bai2Tuan5
+
+../output/host/bin/arm-buildroot-linux-gnueabihf-gcc app_test.c -o test_dynamic -L. -lmylib
+```
+
+---
+
+## 🚀 Bước 5: Copy sang BBB
 
 ```bash
 scp test_static test_dynamic root@<IP_BBB>:/root/
-scp libptit.so root@<IP_BBB>:/usr/lib/
+scp libmylib.so root@<IP_BBB>:/usr/lib/
 ```
 
-Chạy:
+---
+
+## ▶️ Chạy
 
 ```bash
 ./test_static
 ./test_dynamic
-```
-
----
-
-## 🔍 Bước 6: So sánh
-
-```bash
-ls -lh
-```
-
-```bash
-./output/host/bin/arm-buildroot-linux-gnueabihf-readelf -d app_dynamic | grep NEEDED
 ```
 
 ---
@@ -278,7 +274,7 @@ config BR2_PACKAGE_LIBKMT
 ## 🧩 Bước 2: Tạo app
 
 ```bash
-mkdir -p package/my_app/src
+mkdir -p package/myapp/src
 ```
 
 👉 App sử dụng:
@@ -349,7 +345,7 @@ sudo dd if=output/images/sdcard.img of=/dev/sdX bs=4M status=progress conv=fsync
 ## ▶️ Chạy trên BBB
 
 ```bash
-my_app
+myapp
 ```
 
 ---
