@@ -66,10 +66,36 @@ int main() {
     printf("%s\n", cJSON_Print(json));
     cJSON_Delete(json);
     return 0;
+}#include <stdio.h>
+#include <cjson/cJSON.h>
+
+int main()
+{
+    const char *json_string = "{\"name\":\"Binh\",\"age\":22,\"city\":\"Hanoi\"}";
+
+    cJSON *json = cJSON_Parse(json_string);
+
+    if (json == NULL)
+    {
+        printf("JSON parse error\n");
+        return -1;
+    }
+
+    cJSON *name = cJSON_GetObjectItem(json, "name");
+    cJSON *age = cJSON_GetObjectItem(json, "age");
+    cJSON *city = cJSON_GetObjectItem(json, "city");
+
+    printf("Name: %s\n", name->valuestring);
+    printf("Age: %d\n", age->valueint);
+    printf("City: %s\n", city->valuestring);
+
+    cJSON_Delete(json);
+
+    return 0;
 }
 ```
 
----
+
 
 ## ⚙️ Bước 3: Cross-compile
 
@@ -124,8 +150,8 @@ scp output/target/usr/lib/libcjson.so* root@<IP_BBB>:/usr/lib/
 
 ## 📷 Ảnh kết quả
 
-![BT05\_Bai1](link_anh_cua_ban)
-
+![bai1](1.jpg)
+![bai1_1](2.jpg)
 ---
 
 # 🧪 Bài 2: Tạo thư viện cá nhân
