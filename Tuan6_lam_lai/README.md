@@ -95,7 +95,7 @@ $(eval $(generic-package))
 ### 🔹 Khai báo gói vào menu tổng
 
 👉 Ảnh:  
-![Bai4](https://raw.githubusercontent.com/Binhriven/Hethongnhung/main/Tuan6_lam_lai/4.jpg)
+![Bai4](https://raw.githubusercontent.com/Binhriven/Hethongnhung/main/Tuan6_lam_lai/7.jpg)
 
 ---
 
@@ -106,14 +106,14 @@ make menuconfig
 ```
 
 👉 Ảnh:  
-![Bai5](https://raw.githubusercontent.com/Binhriven/Hethongnhung/main/Tuan6_lam_lai/5.jpg)
+![Bai5](https://raw.githubusercontent.com/Binhriven/Hethongnhung/main/Tuan6_lam_lai/8.jpg)
 
 ---
 
 ### 🔹 Kết quả build
 
 👉 Ảnh:  
-![Bai6](https://raw.githubusercontent.com/Binhriven/Hethongnhung/main/Tuan6_lam_lai/6.jpg)
+![Bai6](https://raw.githubusercontent.com/Binhriven/Hethongnhung/main/Tuan6_lam_lai/9.jpg)
 
 ---
 
