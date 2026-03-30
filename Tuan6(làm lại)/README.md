@@ -17,7 +17,7 @@ echo 1 > /sys/class/gpio/gpio60/value
 
 👉 Link ảnh:
 
-https://github.com/your_repo/images/gpio_led.png
+![Bai1](1.jpg)
 🧩 Bài tập 2 : Viết chương trình C/C++ và đóng gói vào Buildroot
 🔹 Bước 1: Viết mã nguồn C và Makefile
 Code C:
@@ -67,18 +67,18 @@ endef
 $(eval $(generic-package))
 🔹 Khai báo gói vào menu tổng của Buildroot
 
-👉 Link ảnh:
+👉 Link ảnh:![Bai4](4.jpg)
 
 https://github.com/your_repo/images/config_in.png
 🔹 Kích hoạt gói trong Menuconfig
 make menuconfig
 
-👉 Link ảnh:
+👉 Link ảnh:![Bai5](5.jpg)
 
 https://github.com/your_repo/images/menuconfig.png
 🔹 Kết quả build
 
-👉 Link ảnh:
+👉 Link ảnh:![Bai6](6.jpg)
 
 https://github.com/your_repo/images/build_result.png
 🧩 Bài tập 3 : Tự khởi chạy
@@ -90,4 +90,4 @@ EOF
 🔹 Bước 2: Cấp quyền thực thi
 chmod +x /etc/init.d/S99blink
 🔹 Bước 3: Hiển thị kết quả
-
+![Bai11](11.jpg)
