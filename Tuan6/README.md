@@ -1,4 +1,4 @@
-# Tuần 6: Linux LED Driver – Blink Application – Autostart Service
+# Tuần 7: Linux LED Driver – Blink Application – Autostart Service
 
 ## Mục tiêu
 
